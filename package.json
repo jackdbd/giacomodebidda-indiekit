@@ -1,0 +1,16 @@
+{
+  "name": "foo-indiekit-server",
+  "version": "0.1.0",
+  "description": "Indiekit server for https://giacomodebidda.com/",
+  "author": "Giacomo Debidda <giacomo@giacomodebidda.com> (https://giacomodebidda.com/)",
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
+  "dependencies": {
+    "@indiekit/indiekit": "^1.0.0-beta.19",
+    "@indiekit/preset-eleventy": "^1.0.0-beta.10",
+    "@indiekit/store-github": "^1.0.0-beta.19",
+    "@indiekit/syndicator-mastodon": "^1.0.0-beta.19"
+  }
+}

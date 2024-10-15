@@ -1,0 +1,16 @@
+.devenv/
+.devenv.flake.nix
+.dockerignore
+.direnv/
+.env
+.envrc
+.git/
+.gitignore
+.pre-commit-config.yaml
+.vscode/
+
+devenv.*
+docker-compose.yml
+Dockerfile
+node_modules/
+npm-debug.log

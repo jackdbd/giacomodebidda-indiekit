@@ -1,0 +1,5 @@
+.devenv*
+devenv.local.nix
+.direnv/
+node_modules/
+.pre-commit-config.yaml
