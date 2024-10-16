@@ -25,9 +25,10 @@ in {
     MONGO_INITDB_ROOT_PASSWORD = "secret";
     # MongoDB I use in development (use `devenv up` to launch it)
     MONGO_URL = "mongodb://${config.env.MONGO_INITDB_ROOT_USERNAME}:${config.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:${config.env.MONGO_PORT}";
-    # MongoDB I use in production
-    # MONGO_URL = indiekit_secrets.mongo_url;
+    # MongoDB I use in production (hosted on MongoDB Atlas)
+    MONGO_URL_PRODUCTION = indiekit_secrets.mongo_url;
     PASSWORD_SECRET = indiekit_secrets.password_secret;
+    PASSWORD_SECRET_ESCAPED = indiekit_secrets.password_secret_escaped;
     SECRET = indiekit_secrets.secret;
   };
 
@@ -70,19 +71,39 @@ in {
     container-dive.exec = ''
       dive indiekit:latest
     '';
+    container-inspect.exec = ''
+      docker inspect indiekit:latest --format json | jq "."
+    '';
     container-run.exec = ''
       docker run \
+        --env DEBUG="indiekit:*,-indiekit:request,indiekit-store:*" \
         --env GITHUB_TOKEN=${config.env.GITHUB_TOKEN} \
         --env MONGO_URL=${config.env.MONGO_URL} \
-        --env PASSWORD_SECRET=${config.env.PASSWORD_SECRET} \
+        --env PASSWORD_SECRET=${config.env.PASSWORD_SECRET_ESCAPED} \
+        --env PORT=3000 \
         --env SECRET=${config.env.SECRET} \
-        -p 3001:3000 indiekit:latest
+        --network host \
+        indiekit:latest
     '';
     container-scan.exec = ''
       trivy image --severity MEDIUM,HIGH,CRITICAL -f table indiekit:latest
     '';
+    fly-deploy.exec = ''
+      fly deploy --verbose
+    '';
+    fly-secrets-set.exec = ''
+      fly secrets set GITHUB_TOKEN="${config.env.GITHUB_TOKEN}"
+      fly secrets set MONGO_URL="${config.env.MONGO_URL_PRODUCTION}"
+      fly secrets set PASSWORD_SECRET="${config.env.PASSWORD_SECRET_ESCAPED}"
+      fly secrets set SECRET="${config.env.SECRET}"
+    '';
+    fly-secrets-unset.exec = ''
+      fly secrets unset GITHUB_TOKEN
+      fly secrets unset MONGO_URL
+      fly secrets unset PASSWORD_SECRET
+      fly secrets unset SECRET
+    '';
     serve.exec = ''
-      # npx indiekit serve --port 3002
       node node_modules/@indiekit/indiekit/bin/cli.js serve --port 3001
     '';
     versions.exec = ''
