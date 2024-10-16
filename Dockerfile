@@ -1,29 +1,25 @@
-# Adjust NODE_VERSION as desired
 ARG NODE_VERSION=20.5.0
 FROM node:${NODE_VERSION}-alpine
 
-# Create app directory
+ENV NODE_ENV=production \
+    PORT=3000
+
+EXPOSE $PORT
+RUN if [ -z "${PORT}" ] ; then echo "PORT not set!" ; exit 1; fi
+
+ARG NON_ROOT_USER=indiekit
+RUN if [ -z "${NON_ROOT_USER}" ] ; then echo "NON_ROOT_USER not set!" ; exit 1; fi && \
+    addgroup -g 1234 indieweb && \
+    adduser -u 1234 -G indieweb --shell /bin/ash --disabled-password $NON_ROOT_USER --home /home/$NON_ROOT_USER
+
+USER $NON_ROOT_USER
 WORKDIR /usr/src/app
 
-# Set production environment
-ENV NODE_ENV=production
+COPY --chown=$NON_ROOT_USER:$NON_ROOT_USER package*.json ./
+RUN npm ci
 
-# Install node modules
-COPY package*.json ./
+COPY --chown=$NON_ROOT_USER:$NON_ROOT_USER indiekit.config.js .
 
-# Can’t use `npm ci` due to https://github.com/npm/cli/issues/4828
-RUN npm i --omit=dev --package-lock=false
-
-# Copy application code
-COPY . .
-
-# Expose port
-EXPOSE 3000
-
-# Start the server by default, this can be overwritten at runtime
-CMD [ "npx", "indiekit", "serve" ]
-
-# I tried using this image but it didn't build because of the `npm i` command.
-# I guess distroless images can be used just as last stage in a multi stage Dockerfile.
-# ARG NODEJS_MAJOR_VERSION=22
-# FROM gcr.io/distroless/nodejs${NODEJS_MAJOR_VERSION}-debian12
+# ENTRYPOINT ["node", "node_modules/@indiekit/indiekit/bin/cli.js", "--config", "indiekit.config.js"]
+# CMD ["serve"]
+CMD node node_modules/@indiekit/indiekit/bin/cli.js --config indiekit.config.js serve
