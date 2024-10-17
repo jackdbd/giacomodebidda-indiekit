@@ -90,7 +90,10 @@ in {
       trivy image --severity MEDIUM,HIGH,CRITICAL -f table indiekit:latest
     '';
     fly-deploy.exec = ''
-      fly deploy --verbose
+      fly deploy --ha=false --debug --verbose
+    '';
+    fly-scale.exec = ''
+      fly scale count 1 --debug --verbose
     '';
     fly-secrets-set.exec = ''
       fly secrets set GITHUB_TOKEN="${config.env.GITHUB_TOKEN}"

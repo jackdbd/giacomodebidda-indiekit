@@ -13,7 +13,7 @@ RUN if [ -z "${NON_ROOT_USER}" ] ; then echo "NON_ROOT_USER not set!" ; exit 1; 
     adduser -u 1234 -G indieweb --shell /bin/ash --disabled-password $NON_ROOT_USER --home /home/$NON_ROOT_USER
 
 USER $NON_ROOT_USER
-WORKDIR /usr/src/app
+WORKDIR /home/$NON_ROOT_USER
 
 COPY --chown=$NON_ROOT_USER:$NON_ROOT_USER package*.json ./
 RUN npm ci

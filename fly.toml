@@ -1,25 +1,24 @@
-# fly.toml app configuration file generated for foo-still-firefly-4401 on 2024-10-16T13:52:27+02:00
+# fly.toml app configuration file generated for giacomodebidda-indiekit on 2024-10-17T11:11:43+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'foo-still-firefly-4401'
+app = 'giacomodebidda-indiekit'
 primary_region = 'fra'
 
-[build.args]
-  NODE_VERSION="22.9.0"
+[build]
 
 [deploy]
-  strategy = "immediate"
+  strategy = 'immediate'
 
 [env]
-  DEBUG = "indiekit:*,-indiekit:request,indiekit-store:*"
+  DEBUG = 'indiekit:*,-indiekit:request,indiekit-store:*'
 
 [http_service]
-  auto_start_machines = true
-  auto_stop_machines = 'stop'
-  force_https = true
   internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
 
