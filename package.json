@@ -1,8 +1,17 @@
 {
-  "name": "foo-indiekit-server",
+  "name": "giacomodebidda-indiekit",
+  "private": true,
   "version": "0.1.0",
-  "description": "Indiekit server for https://giacomodebidda.com/",
-  "author": "Giacomo Debidda <giacomo@giacomodebidda.com> (https://giacomodebidda.com/)",
+  "description": "Indiekit server for my personal website",
+  "keywords": [
+    "indiekit",
+    "indieweb"
+  ],
+  "author": {
+    "name": "Giacomo Debidda",
+    "url": "https://giacomodebidda.com/"
+  },
+  "homepage": "https://indiekit.giacomodebidda.com",
   "engines": {
     "node": ">=20"
   },

@@ -7,10 +7,8 @@
       "name": "Debug Indiekit",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/node_modules/@indiekit/indiekit/bin/cli.js",
-      // "args": ["--config", "path/to/your/indiekit.config.js"]
-      "args": ["serve"],
+      "args": ["--config", "${workspaceFolder}/indiekit.config.js", "serve"],
       "env": {
-        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}",
         "MONGO_URL": "${env:MONGO_URL}"
       }
     }

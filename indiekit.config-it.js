@@ -2,7 +2,7 @@ import process from "node:process";
 
 const config = {
   application: {
-    locale: "en",
+    locale: "it",
     name: "My IndieWeb Server",
     timeZone: "Europe/Rome",
   },

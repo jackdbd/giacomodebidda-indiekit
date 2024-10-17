@@ -20,6 +20,5 @@ RUN npm ci
 
 COPY --chown=$NON_ROOT_USER:$NON_ROOT_USER indiekit.config.js .
 
-# CMD node node_modules/@indiekit/indiekit/bin/cli.js --config indiekit.config.js serve
 ENTRYPOINT ["node", "node_modules/@indiekit/indiekit/bin/cli.js", "--config", "indiekit.config.js"]
 CMD ["serve"]

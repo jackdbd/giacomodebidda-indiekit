@@ -37,6 +37,7 @@ in {
   };
 
   packages = with pkgs; [
+    dive # tool for exploring each layer in a docker image
     git
     nodejs
     trivy # container scanner
@@ -104,7 +105,10 @@ in {
       fly secrets unset SECRET
     '';
     serve.exec = ''
-      node node_modules/@indiekit/indiekit/bin/cli.js serve --port 3001
+      node node_modules/@indiekit/indiekit/bin/cli.js serve --config indiekit.config.js --port 3001
+    '';
+    serve-it.exec = ''
+      node node_modules/@indiekit/indiekit/bin/cli.js serve --config indiekit.config-it.js --port 3002
     '';
     versions.exec = ''
       echo "=== Versions ==="
