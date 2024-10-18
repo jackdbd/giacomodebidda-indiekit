@@ -5,9 +5,8 @@
   pkgs,
   ...
 }: let
-  # Read and parse JSON files containing secrets
   cloudflare_r2 = builtins.fromJSON (builtins.readFile /run/secrets/cloudflare/r2);
-  indiekit_secrets = builtins.fromJSON (builtins.readFile /run/secrets/indiekit);
+  indiekit = builtins.fromJSON (builtins.readFile /run/secrets/indiekit);
 in {
   enterShell = ''
     versions
@@ -27,12 +26,13 @@ in {
     # MongoDB I use in development (use `devenv up` to launch it)
     MONGO_URL = "mongodb://${config.env.MONGO_INITDB_ROOT_USERNAME}:${config.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:${config.env.MONGO_PORT}";
     # MongoDB I use in production (hosted on MongoDB Atlas)
-    MONGO_URL_PRODUCTION = indiekit_secrets.mongo_url;
-    PASSWORD_SECRET = indiekit_secrets.password_secret;
-    PASSWORD_SECRET_ESCAPED = indiekit_secrets.password_secret_escaped;
+    MONGO_URL_PRODUCTION = indiekit.mongo_url;
+    PASSWORD_SECRET = indiekit.password_secret;
+    PASSWORD_SECRET_ESCAPED = indiekit.password_secret_escaped;
+    PORT = "3001";
     S3_ACCESS_KEY = cloudflare_r2.personal.access_key_id;
     S3_SECRET_KEY = cloudflare_r2.personal.secret_access_key;
-    SECRET = indiekit_secrets.secret;
+    SECRET = indiekit.secret;
   };
 
   languages = {
@@ -85,7 +85,7 @@ in {
         --env GITHUB_TOKEN=${config.env.GITHUB_TOKEN} \
         --env MONGO_URL=${config.env.MONGO_URL} \
         --env PASSWORD_SECRET=${config.env.PASSWORD_SECRET_ESCAPED} \
-        --env PORT=3000 \
+        --env PORT=${config.env.PORT} \
         --env SECRET=${config.env.SECRET} \
         --network host \
         indiekit:latest
@@ -119,11 +119,14 @@ in {
 
     serve.exec = ''
       node node_modules/@indiekit/indiekit/bin/cli.js serve \
-      --config indiekit.config.js --port 3001
+      --config indiekit.config.js --port ${config.env.PORT}
     '';
 
     versions.exec = ''
       echo "=== Versions ==="
+      dive --version
+      docker --version
+      fly version
       git --version
       echo "Node.js $(node --version)"
       echo "=== === ==="
@@ -139,15 +142,6 @@ in {
       ];
       initDatabasePassword = "${config.env.MONGO_INITDB_ROOT_PASSWORD}";
       initDatabaseUsername = "${config.env.MONGO_INITDB_ROOT_USERNAME}";
-    };
-  };
-
-  tasks = {
-    "app:versions" = {
-      exec = "versions";
-    };
-    "bash:hello" = {
-      exec = "echo 'Hello World'";
     };
   };
 }

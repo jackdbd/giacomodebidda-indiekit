@@ -1,14 +1,32 @@
 import process from "node:process";
 
-const cloudflare_account_id = "43f9884041661b778e95a26992850715";
+let url;
+if (process.env.FLY_APP_NAME) {
+  // https://fly.io/docs/machines/runtime-environment/#environment-variables
+  url = "https://giacomodebidda-indiekit.fly.dev";
+  // I created a CNAME record on Cloudflare DNS, yet this doesn't work.
+  // url = "https://indiekit.giacomodebidda.com";
+} else {
+  url = `http://localhost:${process.env.PORT}`;
+}
 
+// A publication is any website to which you are publishing content to via Indiekit.
+// https://getindiekit.com/concepts#publication
+// With this, no images show up in the Indiekit UI because I have yet something
+// to implement on my website.
 const publication_me = "https://www.giacomodebidda.com/";
+// With this, images show up in the Indiekit UI because they are served from a
+// Cloudflare R2 bucket which is publicly exposed on this subdomain.
+// const publication_me = "https://content.giacomodebidda.com/";
+
 // const categories = `${publication_me}/tags/index.json`;
 // Should I create an index.json like this one?
 // https://github.com/aciccarello/ciccarello-indiekit/blob/3381efe087a99b4ceaed44af2bf8f80ca79e52a8/indiekit.config.js#L61C5-L61C52
 // here is how to do it:
 // https://github.com/aciccarello/ciccarello.me/blob/main/posts/tags/index.json.11ty.js
 // https://www.giacomodebidda.com/tags/index.html
+
+const cloudflare_account_id = "43f9884041661b778e95a26992850715";
 
 const config = {
   application: {
@@ -19,7 +37,7 @@ const config = {
     name: "Indiekit",
     themeColor: "#C80815",
     timeZone: "Europe/Rome",
-    // url: "https://indiekit.giacomodebidda.com",
+    url,
   },
   plugins: [
     "@indiekit/preset-eleventy",
@@ -52,6 +70,8 @@ const config = {
   },
 };
 
-console.log(`Indiekit server will publish to ${config.publication.me}`);
+console.info(
+  `Indiekit server runs at ${config.application.url} and publishes to ${config.publication.me}`,
+);
 
 export default config;

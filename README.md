@@ -1,6 +1,6 @@
 # My Indiekit server
 
-This repository contains the configuration for the [Indiekit](https://github.com/getindiekit/indiekit/) server I use for [giacomodebidda.com](https://www.giacomodebidda.com/).
+[Indiekit](https://github.com/getindiekit/indiekit/) server I use to publish content to the [giacomodebidda-content](https://github.com/jackdbd/giacomodebidda-content/) repository.
 
 ## Development
 
