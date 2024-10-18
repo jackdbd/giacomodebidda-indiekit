@@ -5,7 +5,8 @@
   pkgs,
   ...
 }: let
-  # Read and parse ther JSON file containing the Indiekit secrets
+  # Read and parse JSON files containing secrets
+  cloudflare_r2 = builtins.fromJSON (builtins.readFile /run/secrets/cloudflare/r2);
   indiekit_secrets = builtins.fromJSON (builtins.readFile /run/secrets/indiekit);
 in {
   enterShell = ''
@@ -29,6 +30,8 @@ in {
     MONGO_URL_PRODUCTION = indiekit_secrets.mongo_url;
     PASSWORD_SECRET = indiekit_secrets.password_secret;
     PASSWORD_SECRET_ESCAPED = indiekit_secrets.password_secret_escaped;
+    S3_ACCESS_KEY = cloudflare_r2.personal.access_key_id;
+    S3_SECRET_KEY = cloudflare_r2.personal.secret_access_key;
     SECRET = indiekit_secrets.secret;
   };
 
@@ -69,12 +72,13 @@ in {
     container-build.exec = ''
       docker build --build-arg NODE_VERSION=22.9.0 --tag indiekit:latest .
     '';
-    container-dive.exec = ''
-      dive indiekit:latest
-    '';
+
+    container-dive.exec = "dive indiekit:latest";
+
     container-inspect.exec = ''
       docker inspect indiekit:latest --format json | jq "."
     '';
+
     container-run.exec = ''
       docker run \
         --env DEBUG="indiekit:*,-indiekit:request,indiekit-store:*" \
@@ -86,33 +90,38 @@ in {
         --network host \
         indiekit:latest
     '';
+
     container-scan.exec = ''
       trivy image --severity MEDIUM,HIGH,CRITICAL -f table indiekit:latest
     '';
-    fly-deploy.exec = ''
-      fly deploy --ha=false --debug --verbose
-    '';
-    fly-scale.exec = ''
-      fly scale count 1 --debug --verbose
-    '';
+
+    fly-deploy.exec = "fly deploy --ha=false --debug --verbose";
+
+    fly-scale.exec = "fly scale count 1 --debug --verbose";
+
     fly-secrets-set.exec = ''
       fly secrets set GITHUB_TOKEN="${config.env.GITHUB_TOKEN}"
       fly secrets set MONGO_URL="${config.env.MONGO_URL_PRODUCTION}"
       fly secrets set PASSWORD_SECRET="${config.env.PASSWORD_SECRET_ESCAPED}"
+      fly secrets set S3_ACCESS_KEY="${config.env.S3_ACCESS_KEY}"
+      fly secrets set S3_SECRET_KEY="${config.env.S3_SECRET_KEY}"
       fly secrets set SECRET="${config.env.SECRET}"
     '';
+
     fly-secrets-unset.exec = ''
       fly secrets unset GITHUB_TOKEN
       fly secrets unset MONGO_URL
       fly secrets unset PASSWORD_SECRET
+      fly secrets unset S3_ACCESS_KEY
+      fly secrets unset S3_SECRET_KEY
       fly secrets unset SECRET
     '';
+
     serve.exec = ''
-      node node_modules/@indiekit/indiekit/bin/cli.js serve --config indiekit.config.js --port 3001
+      node node_modules/@indiekit/indiekit/bin/cli.js serve \
+      --config indiekit.config.js --port 3001
     '';
-    serve-it.exec = ''
-      node node_modules/@indiekit/indiekit/bin/cli.js serve --config indiekit.config-it.js --port 3002
-    '';
+
     versions.exec = ''
       echo "=== Versions ==="
       git --version
