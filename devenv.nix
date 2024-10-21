@@ -6,6 +6,7 @@
   ...
 }: let
   cloudflare_r2 = builtins.fromJSON (builtins.readFile /run/secrets/cloudflare/r2);
+  fly_indiekit = builtins.fromJSON (builtins.readFile /run/secrets/fly/indiekit);
   indiekit = builtins.fromJSON (builtins.readFile /run/secrets/indiekit);
 in {
   enterShell = ''
@@ -19,6 +20,7 @@ in {
 
   env = {
     DEBUG = "indiekit:*,-indiekit:request,indiekit-store:*";
+    FLY_API_TOKEN = fly_indiekit.deploy_token;
     GITHUB_TOKEN = builtins.readFile /run/secrets/github-tokens/indiekit_github_content_store;
     MONGO_PORT = "27017";
     MONGO_INITDB_ROOT_USERNAME = "mongoadmin";
@@ -49,6 +51,7 @@ in {
   # https://devenv.sh/pre-commit-hooks/
   pre-commit.hooks = {
     alejandra.enable = true;
+    hadolint.enable = true;
     prettier.enable = true;
     shellcheck.enable = true;
     statix.enable = true;
@@ -134,6 +137,8 @@ in {
   };
 
   services = {
+    # minio.enable = true;
+    # opentelemetry-collector.enable = true;
     mongodb = {
       enable = true;
       additionalArgs = [

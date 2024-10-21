@@ -5,6 +5,7 @@
 .env
 .envrc
 .git/
+.github/
 .gitignore
 .pre-commit-config.yaml
 .vscode/

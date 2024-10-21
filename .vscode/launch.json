@@ -9,6 +9,7 @@
       "program": "${workspaceFolder}/node_modules/@indiekit/indiekit/bin/cli.js",
       "args": ["--config", "${workspaceFolder}/indiekit.config.js", "serve"],
       "env": {
+        "DEBUG": "indiekit:*,-indiekit:request,indiekit-store:*",
         "MONGO_URL": "${env:MONGO_URL}"
       }
     }
